@@ -1,19 +1,14 @@
 # This is a script written to extract data with OMDB API
-# This specific version was written by Vincent Diep for data on the movie 'Deadpool'
 
 import requests
 import pandas as pd
+from sqlalchemy import create_engine
 
 def extract_data(api_key, movie_title):
     url = f"http://www.omdbapi.com/?t={movie_title}&apikey={api_key}"
     response = requests.get(url)
     data = response.json()
     return data
-
-api_key = '9be005ab'
-movie_title = 'Deadpool'
-movie_data = extract_data(api_key, movie_title)
-# print(movie_data)
 
 def transform_data(data):
     # Converting to DataFrame for easier transformation
@@ -27,5 +22,27 @@ def transform_data(data):
     df['imdb_rating'] = pd.to_numeric(df['imdb_rating'], errors='coerce')
     return df
 
-transformed_data = transform_data(movie_data)
-print(transformed_data)
+# print(transformed_data)
+
+def load_data(df, db_url):
+    engine = create_engine(db_url)
+    df.to_sql('movies', engine, if_exists='append', index=False)
+
+def etl_process(api_key, movie_title, db_url):
+    # Extract movie data
+    movie_data = extract_data(api_key, movie_title)
+    # Transform movie data
+    transformed_data = transform_data(movie_data)
+    # Load movie data
+    load_data(transformed_data, db_url)
+    
+# API key to use OMDB API
+# You can get one here https://omdbapi.com/apikey.aspx
+api_key = '[your_api_key]'
+movie_titles = ['Iron Man', 'The Incredible Hulk', 'Thor', 'Doctor Strange', 'Deadpool', 'Black Panther']
+db_url = 'postgresql+psycopg2://[your_username]:[your_password]@localhost/moviedb'
+
+for movie_title in movie_titles:
+    print(movie_title)
+    etl_process(api_key, movie_title, db_url)
+print('ETL Process complete')
