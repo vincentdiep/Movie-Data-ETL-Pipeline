@@ -39,8 +39,9 @@ def etl_process(api_key, movie_title, db_url):
 # API key to use OMDB API
 # You can get one here https://omdbapi.com/apikey.aspx
 api_key = '[your_api_key]'
-movie_titles = ['Iron Man', 'The Incredible Hulk', 'Thor', 'Doctor Strange', 'Deadpool', 'Black Panther']
 db_url = 'postgresql+psycopg2://[your_username]:[your_password]@localhost/moviedb'
+
+movie_titles = ['Iron Man', 'The Incredible Hulk', 'Thor', 'Doctor Strange', 'Deadpool', 'Black Panther']
 
 for movie_title in movie_titles:
     print(movie_title)
